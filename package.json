@@ -1,6 +1,6 @@
 {
   "name": "ui-state-loader",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Angular UI Router state definition loader",
   "main": "index.js",
   "scripts": {

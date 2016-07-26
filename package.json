@@ -1,0 +1,29 @@
+{
+  "name": "ui-state-loader",
+  "version": "1.0.0",
+  "description": "Angular UI Router state definition loader",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mooyoul/ui-state-loader.git"
+  },
+  "keywords": [
+    "angular",
+    "angular-ui",
+    "ui-router",
+    "webpack",
+    "webpack-loader"
+  ],
+  "author": "MooYeol Prescott Lee <mooyoul@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mooyoul/ui-state-loader/issues"
+  },
+  "homepage": "https://github.com/mooyoul/ui-state-loader#readme",
+  "dependencies": {
+    "ast-query": "^2.0.0"
+  }
+}

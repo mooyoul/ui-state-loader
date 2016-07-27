@@ -46,14 +46,14 @@ module.exports = function(source) {
   });
 
   return 'module.exports = exports = ' + JSON.stringify(stateNodes.map(function(node) {
-      return node.arguments[1].properties.reduce(function(hash, prop) {
-        if (prop.value.type !== 'CallExpression') {
-          hash[prop.key.name] = prop.value.value;
-        }
+    return node.arguments[1].properties.reduce(function(hash, prop) {
+      if (prop.value.type !== 'CallExpression') {
+        hash[prop.key.name] = prop.value.value;
+      }
 
-        return hash;
-      }, { name: node.arguments[0].value });
-    }));
+      return hash;
+    }, { name: node.arguments[0].value });
+  }));
 };
 
 

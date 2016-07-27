@@ -1,7 +1,7 @@
 # ui-state-loader
-[Angular UI Router](https://github.com/angular-ui/ui-router) definition loader
+[Angular UI Router](https://github.com/angular-ui/ui-router) state definition loader
 
-Exports state definition from source
+Extract and Exports state definition from source
 
 ## Installation
 ```

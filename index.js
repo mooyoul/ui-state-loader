@@ -1,33 +1,30 @@
 'use strict';
 
-var
-  loaderUtils = require('loader-utils'),
-  acorn       = require('acorn'),
-  traverse    = require('traverse');
+var loaderUtils = require('loader-utils'),
+  acorn = require('acorn'),
+  traverse = require('traverse');
 
-
-module.exports = function(source) {
-  var
-    query       = loaderUtils.parseQuery(this.query),
-    configKey   = query.config || "uiStateLoader",
-    config      = {
+module.exports = function (source) {
+  var query = loaderUtils.parseQuery(this.query),
+    configKey = query.config || 'uiStateLoader',
+    config = {
       select: [],
-      providerName: '$stateProvider'
+      providerName: '$stateProvider',
+      sourceType: 'module',
     },
-    tree        = acorn.parse(source),
-    stateNodes, _options;
-
+    stateNodes,
+    _options;
 
   this.cacheable && this.cacheable();
 
-  Object.keys(query).forEach(function(attr) {
+  Object.keys(query).forEach(function (attr) {
     config[attr] = query[attr];
   });
 
   _options = this.options[configKey];
 
   if (_options) {
-    Object.keys(_options).forEach(function(attr) {
+    Object.keys(_options).forEach(function (attr) {
       config[attr] = _options[attr];
     });
   }
@@ -36,26 +33,40 @@ module.exports = function(source) {
     config.select = config.select.split(/[, ]/g);
   }
 
+  var tree = acorn.parse(source, { sourceType: config.sourceType });
+  stateNodes = traverse(tree)
+    .nodes()
+    .filter(function (node) {
+      return (
+        node &&
+        node.type === 'CallExpression' &&
+        node.callee &&
+        node.callee.property &&
+        node.callee.property.name === 'state' &&
+        hasValidCallee(node, config.providerName) &&
+        node.arguments &&
+        node.arguments[1]
+      );
+    });
 
-  stateNodes = traverse(tree).nodes().filter(function(node) {
-    return node && node.type === 'CallExpression' &&
-      node.callee && node.callee.property &&
-      node.callee.property.name === 'state' &&
-      hasValidCallee(node, config.providerName) &&
-      node.arguments && node.arguments[1];
-  });
+  return (
+    'module.exports = exports = ' +
+    JSON.stringify(
+      stateNodes.map(function (node) {
+        return node.arguments[1].properties.reduce(
+          function (hash, prop) {
+            if (prop.value.type !== 'CallExpression') {
+              hash[prop.key.name] = prop.value.value;
+            }
 
-  return 'module.exports = exports = ' + JSON.stringify(stateNodes.map(function(node) {
-    return node.arguments[1].properties.reduce(function(hash, prop) {
-      if (prop.value.type !== 'CallExpression') {
-        hash[prop.key.name] = prop.value.value;
-      }
-
-      return hash;
-    }, { name: node.arguments[0].value });
-  }));
+            return hash;
+          },
+          { name: node.arguments[0].value }
+        );
+      })
+    )
+  );
 };
-
 
 function hasValidCallee(node, providerName) {
   if (node.callee) {
@@ -66,6 +77,9 @@ function hasValidCallee(node, providerName) {
     return hasValidCallee(node.object.callee, providerName);
   }
 
-  return node.object && node.object.type === 'Identifier' &&
-    node.object.name === providerName;
+  return (
+    node.object &&
+    node.object.type === 'Identifier' &&
+    node.object.name === providerName
+  );
 }

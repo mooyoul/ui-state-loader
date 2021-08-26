@@ -10,8 +10,8 @@ module.exports = function (source) {
     config = {
       select: [],
       providerName: '$stateProvider',
+      sourceType: 'module',
     },
-    tree = acorn.parse(source, { sourceType: 'module' }),
     stateNodes,
     _options;
 
@@ -33,6 +33,7 @@ module.exports = function (source) {
     config.select = config.select.split(/[, ]/g);
   }
 
+  var tree = acorn.parse(source, { sourceType: config.sourceType });
   stateNodes = traverse(tree)
     .nodes()
     .filter(function (node) {
